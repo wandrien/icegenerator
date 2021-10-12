@@ -87,6 +87,10 @@ void *data_server(void *arg)
 
   const char * error_at_stage = NULL;
 
+  int port = conf_obj->GetIntValue(CONFIG_DATAPORT, 0);
+  if (!port)
+    port = 8796;
+
   if (conf_obj->GetValue(CONFIG_DATAPORT) == NULL) {
     log_obj->printf("Telnet interface is disabled");
     goto out;
@@ -94,9 +98,7 @@ void *data_server(void *arg)
 
   memset(&sin, 0, sizeof(sin));
   sin.sin_family = AF_INET;
-  sin.sin_port = htons(conf_obj->GetIntValue(CONFIG_DATAPORT, 0));
-  if (!sin.sin_port)
-    sin.sin_port = 8796;
+  sin.sin_port = htons(port);
   sin.sin_addr.s_addr = htonl(INADDR_ANY);
 
   my_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -115,7 +117,7 @@ void *data_server(void *arg)
     goto out;
   }
 
-  log_obj->printf("Telnet interface is enabled");
+  log_obj->printf("Telnet interface is enabled on port %d", port);
   while (!ok_to_end)
   {
     int buf_len, i;
@@ -213,7 +215,7 @@ void *data_server(void *arg)
 out:
 
   if (error_at_stage) {
-    log_obj->WriteLog("%s. Telnet interface not available.", error_at_stage);
+    log_obj->printf("Telnet interface not available. %s.", error_at_stage);
   }
 
   if (int_buf)
