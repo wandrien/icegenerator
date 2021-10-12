@@ -86,23 +86,24 @@ void *selector(void *arg)
       ok_to_end = true;
       sem_obj->Signal(track_load);
     }
-    else
-      if (ready_obj->Empty())
-        if ((conf_obj->GetValue(CONFIG_LOOP) == NULL) || atoi(conf_obj->GetValue(CONFIG_LOOP)))
-        {
-          cCircularList *temp;
+    else if (ready_obj->Empty())
+    {
+      if ((conf_obj->GetValue(CONFIG_LOOP) == NULL) || atoi(conf_obj->GetValue(CONFIG_LOOP)))
+      {
+        cCircularList *temp;
 
-          temp = ready_obj;
-          ready_obj = played_obj;
-          played_obj = temp;
+        temp = ready_obj;
+        ready_obj = played_obj;
+        played_obj = temp;
 
-          log_obj->WriteLog("Rotating queues and looping again...");
-        }
-        else
-        {
-          time_to_quit = true;
-          sem_obj->Signal(track_load);
-        }
+        log_obj->WriteLog("Rotating queues and looping again...");
+      }
+      else
+      {
+        time_to_quit = true;
+        sem_obj->Signal(track_load);
+      }
+    }
   }
 
   delete [] int_buf;
