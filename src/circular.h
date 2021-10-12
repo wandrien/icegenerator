@@ -62,9 +62,9 @@ enum pls_type { _dir, _sql, _pls, _bad_pls };
 class cDoubleLinkedItem
 {
   cDoubleLinkedItem *Prev;
-  char *Data;
-  int offset;
   cDoubleLinkedItem *Next;
+  char *mData;
+  char *mSeparatorPosition;
   #ifdef HAVE_ID3
     struct ID3TableType ID3[MAX_ID3_TAGS];
   #endif

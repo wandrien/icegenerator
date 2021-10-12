@@ -116,7 +116,7 @@ struct ID3TableType ID3Table[MAX_ID3_TAGS] = { { ID3FID_COMMENT, "ID3COMMENT" },
 
 cDoubleLinkedItem::cDoubleLinkedItem(const char *buf)
 {
-  Data = NULL;
+  mData = NULL;
   Prev = Next = NULL;
   
   #ifdef HAVE_ID3
@@ -134,8 +134,8 @@ cDoubleLinkedItem::cDoubleLinkedItem(const char *buf)
 
 cDoubleLinkedItem::~cDoubleLinkedItem()
 {
-  if (Data != NULL)
-    delete [] Data;
+  if (mData != NULL)
+    delete [] mData;
   
   #ifdef HAVE_ID3
     int i;
@@ -171,34 +171,36 @@ cDoubleLinkedItem * cDoubleLinkedItem::GetNext() const
 
 void cDoubleLinkedItem::GetPath(char *buf)
 {
-  if (offset != '\0')
-    strncpy(buf,Data,offset);
-  buf[offset] = '\0';
+  if (mSeparatorPosition) {
+    int len = mSeparatorPosition - mData;
+    memcpy(buf, mData, len);
+    buf[len] = '\0';
+  } else {
+    buf[0] = '\0';
+  }
 }
 
 void cDoubleLinkedItem::GetFile(char *buf)
 {
-  strncpy(buf,(Data+offset+1),strlen(Data)-offset);
+  if (mSeparatorPosition)
+    strcpy(buf, mSeparatorPosition + 1);
+  else
+    strcpy(buf, mData);
 }
 
 char *cDoubleLinkedItem::GetData() const
 {
-  return Data;
+  return mData;
 }
 
 void cDoubleLinkedItem::SetData(const char *buf)
 {
-  if (Data != NULL)
-    delete [] Data;
+  if (mData != NULL)
+    delete [] mData;
 
-  int i;
-  for (i = strlen(buf)-1; ((i >= 0) && (buf[i] != '/')); i--);
-  if (i == -1)
-    i = 0;
-
-  Data = new char[strlen(buf)+1];
-  strcpy(Data,buf);
-  offset = i;
+  mData = new char[strlen(buf)+1];
+  strcpy(mData, buf);
+  mSeparatorPosition = strrchr(mData, '/');
 }
 
 #ifdef HAVE_ID3
@@ -206,14 +208,14 @@ void cDoubleLinkedItem::LoadID3()
 {
   ID3_Tag *my_tag;
 
-  if ((Data != NULL) && (my_tag = new ID3_Tag))
+  if ((mData != NULL) && (my_tag = new ID3_Tag))
   {
     ID3_Frame *my_frame;
     ID3_Field *my_field;
     int i;
     char *temp;
   
-    my_tag->Link(Data);
+    my_tag->Link(mData);
     temp = new char[255];
     
     for (i = 0; i < MAX_ID3_TAGS; i++)
@@ -691,7 +693,8 @@ TEST_CASE( "cDoubleLinkedItem path parsing") {
   auto testData = GENERATE(
     PathTestData {"/abc/101", "/abc", "101"},
     PathTestData {"abc/102", "abc", "102"},
-    PathTestData {"103", "", "103"}
+    PathTestData {"103", "", "103"},
+    PathTestData {"/104/", "/104", ""}
   );
 
   cDoubleLinkedItem item(testData.fullPath);
