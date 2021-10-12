@@ -124,8 +124,9 @@ void *data_server(void *arg)
               }
               else
                 int_buf[i] = toupper(int_buf[i]);
-					
+
             if ((buf_len > 0) && dot_found)
+            {
               if (!strcmp(int_buf,"TRACK"))
               {
                 sem_obj->Wait(data_mutex);
@@ -182,6 +183,7 @@ void *data_server(void *arg)
               }
               else
                 dot_found = false;
+            }
 
             if (!dot_found)
               strcpy(int_buf,"Unknown command");
