@@ -12,14 +12,6 @@ MINOR_VERSION=5
 RELEASE_VERSION=5
 VERSION="$MAJOR_VERSION.$MINOR_VERSION.$RELEASE_VERSION"
 
-if test "x$prefix" = xNONE; then
-  prefix=`eval echo ${ac_default_prefix}`
-fi
-
-if test "x$exec_prefix" = xNONE; then
-  exec_prefix=`eval echo ${ac_default_prefix}`
-fi
-
 dnl checks for programs needed to build.
 CXXFLAGS="-ansi -pedantic"
 
