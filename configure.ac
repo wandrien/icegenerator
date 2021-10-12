@@ -1,4 +1,5 @@
 AC_INIT([IceGenerator],0.5.5,administrator@tortugalabs.it)
+AC_CONFIG_AUX_DIR([build-aux])
 AC_COPYRIGHT([Copyright 2004 Tortuga Labs. Inc.])
 AC_CANONICAL_HOST
 AC_CONFIG_SRCDIR(src/main.cpp)
