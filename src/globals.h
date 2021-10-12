@@ -52,4 +52,7 @@ extern volatile bool time_to_quit;
 extern volatile bool quit_now;
 extern bool ok_to_end, changed;
 
+void cmd_quit();
+void cmd_quit_now();
+
 #endif

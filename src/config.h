@@ -34,8 +34,6 @@
 #ifndef __config_h__
 #define __config_h__
 
-#define MAX_KEYS 23
-
 enum config_key_type {
     #define CONFIG_KEY_FIRST(key) CONFIG_##key,
     #define CONFIG_KEY(key) CONFIG_##key,
@@ -46,10 +44,7 @@ enum config_key_type {
     #undef CONFIG_KEY_LAST
 };
 
-/*
-FIXME: add assert CONFIG_BADKEY == MAX_KEYS
-*/
-
+static_assert(CONFIG_BADKEY == MAX_KEYS, "Wrong MAX_KEYS");
 
 #define INTERNAL_BUF_SIZE 512
                        

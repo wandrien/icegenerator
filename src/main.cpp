@@ -176,14 +176,47 @@ volatile bool quit_now = false;
 bool ok_to_end = false, changed = false;
 char ErrStr[127] = "Unknown error";
 
+void cmd_quit() {
+  time_to_quit = true;
+}
+
+void cmd_quit_now() {
+  time_to_quit = true;
+  quit_now = true;
+}
+
+enum signal_action_type {
+  signal_action_ignore,
+  signal_action_quit,
+  signal_action_quit_now,
+  signal_action_quitnow = signal_action_quit_now
+};
+
+signal_action_type signal_action = signal_action_quit;
+
 static void signal_termination_proc(const int sig)
 {
-  if (!time_to_quit) {
-    char * signal_name = m_strsignal2(sig);
-    log_obj->printf("Got signal %s. Waiting for all child processes to terminate...", signal_name);
-    free(signal_name);
+  switch (signal_action) {
+    case signal_action_ignore:
+      /* do nothing */
+      break;
+    case signal_action_quit:
+    {
+      char * signal_name = m_strsignal2(sig);
+      log_obj->printf("Got signal %s. Waiting for all child processes to terminate...", signal_name);
+      free(signal_name);
+      cmd_quit();
+      break;
+    }
+    case signal_action_quit_now:
+    {
+      char * signal_name = m_strsignal2(sig);
+      log_obj->printf("Got signal %s. Quitting now...", signal_name);
+      free(signal_name);
+      cmd_quit_now();
+      break;
+    }
   }
-  time_to_quit = true;
 }
 
 void clean_objs()
@@ -244,9 +277,25 @@ int main(int argc, char **argv)
     if (conf_obj == NULL)
       conf_obj = new cConfig(DEFAULT_CONF_FILE);
 
+    {
+      const char * action = conf_obj->GetValue(CONFIG_SIGNAL_ACTION);
+      if (!action)
+        action = "quit";
+      #define CHECK(a) \
+        else if (strcasecmp(action, #a) == 0) { \
+          signal_action = signal_action_##a; \
+        }
+      if (0) {}
+      CHECK(ignore)
+      CHECK(quit)
+      CHECK(quitnow)
+      CHECK(quit_now)
+      #undef CHECK
+    }
+
     /* Init log file */
     log_obj = new cLog(conf_obj);
-    
+
     /* Select streaming type and scans directories */
     ready_obj = new cCircularList;
     ready_obj->ParsePlayList(conf_obj);

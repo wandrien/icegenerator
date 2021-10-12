@@ -100,7 +100,7 @@ void *selector(void *arg)
       }
       else
       {
-        time_to_quit = true;
+        cmd_quit();
         sem_obj->Signal(track_load);
       }
     }

@@ -88,6 +88,14 @@ LOOP=1
 # alphabetic order will be used
 SHUFFLE=1
 
+# Action on receiving a signal
+# ignore   - Ignore signal
+# quit     - Quit after current track
+# quitnow  - Quit immediately
+SIGNAL_ACTION=quit
+
+
+
 #######################################################
 # Information
 #######################################################
@@ -124,6 +132,7 @@ METAUPDATE=5
 MDFPATH=/mypath/global.mdf
 
 
+
 #######################################################
 # Debug and logging information
 #######################################################
@@ -138,6 +147,8 @@ LOG=2
 # Specify where you want to log IceG actions. Defaults to /var/log/icegenerator.log
 # if not specified
 LOGPATH=/var/log/icegenerator.log
+
+
 
 #######################################################
 # Telnet interface

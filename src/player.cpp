@@ -76,7 +76,6 @@ void *player(void *arg)
         while ((bytes = read(file_id,buf,SHOUT_BUFFER_LENGTH))) {
           stream_obj->Play((unsigned char *) buf,bytes);
           if (quit_now) {
-            time_to_quit = true;
             break;
           }
         }
