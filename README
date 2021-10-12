@@ -182,6 +182,7 @@ Available commands are:
 - LOOPOFF: deactivates loop.
 - SHUFFLEON: activates shuffle.
 - SHUFFLEOFF: deactivates shuffle.
+- QUIT: quit after current track.
 
 More commands will be available in future.
 

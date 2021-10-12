@@ -175,7 +175,7 @@ volatile bool time_to_quit = false;
 bool ok_to_end = false, changed = false;
 char ErrStr[127] = "Unknown error";
 
-void signal_termination_proc(const int sig)
+static void signal_termination_proc(const int sig)
 {
   if (!time_to_quit) {
     char * signal_name = m_strsignal2(sig);

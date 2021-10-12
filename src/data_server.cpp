@@ -156,7 +156,8 @@ void *data_server(void *arg)
         }
         else if (!strcmp(int_buf,"QUIT"))
         {
-          signal_termination_proc(0);
+          log_obj->printf("Received QUIT command. Waiting for all child processes to terminate...");
+          time_to_quit = true;
           strcpy(int_buf,"OK");
         }
         else if (!strcmp(int_buf,"LOOP"))

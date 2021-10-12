@@ -36,6 +36,4 @@
 
 #define INTERNAL_BUF_SIZE 512
 
-void signal_termination_proc(const int sig);
-
 #endif
