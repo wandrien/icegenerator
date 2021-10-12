@@ -1,0 +1,75 @@
+Version 0.5.5-pre2:
+  - FIXED: Serious configure script bug
+
+Version 0.5.5-pre1:
+  - FIXED: Serious bug in configuration file parser module
+  - FIXED: Don't try to open non-existing files during stream
+  - FIXED: Race condition on meta streamer <-> selector launch
+  - FIXED: Memory leaks
+  - Added ID3 support
+  - Added ICEMETAL language support
+  - Default icegenerator.conf path is now SYSCONFDIR-fixed
+
+Version 0.5.4:
+  - FIXED: Incorrect socket definitions on MacOSX
+  - FIXED: Segfault occurs if log object is NULL when error
+  - FIXED: --with-shout parameter (-lshout -lvorbis missing)
+  - Added PostGreSQL support
+  - Added .M3U playlist support
+  - Added .PLS playlist support
+  - Removed basename function cause is not POSIX compliant
+  - Removed no-rtti option, it causes segfaults on some systems
+  - Log file is now path configurable
+  - Added more info into README file
+
+Version 0.5.3:
+  - FIXED: Missing declaration on Mac OS X
+	- FIXED: Alpha signal.h compilation error
+  - FIXED: removed POSIX definition, cause BSD conflict
+
+Version 0.5.2:
+  - Added telnet minimal interface
+  - Added MySQL support
+	- Code cleaner (again)
+	- FIXED: heading '/' in log file path
+	- FIXED: massive bugfix in configure script
+	
+Version 0.5.1:
+  - Code cleaner
+  - Added SOURCE option
+  - Added LOOP option
+  - Added SHUFFLE option
+  - Added METAUPDATE option
+  - FIXED: Serious bug in SERVER option
+  - FIXED: try/catch mechanism didn't work properly
+  - FIXED: possible error in parsing configuration
+  - FIXED: wrong path bug
+  - FIXED: opendir possibly crash (thanks to DIeMONd)
+  - FIXED: multiple directories existing check
+  - Songs are sorted by filename on SHUFFLE = 0
+  - Now IceG is a GNU standard package, hope that multiple platforms work now
+  - Added MP3/OGG recursive directory search option (thx to DIeMONd again for suggesting me)
+  - MP3/OGG file extension search is now case insensitive
+  - Update time for metadata information is configurable, even metadata information presence too
+
+Version 0.5:
+  - Libshout 1.3.x no longer supported
+  - Full POSIX implementation
+  - Multiple playlist directories
+  - Support for OGG Vorbis
+  - Command line interface
+  - Multiple log configuration
+  - Threads (no more detached processes)
+  - All "external errors" are catched
+  - Clean exit, all system resources are released
+  - FreeBSD/NetBSD/MacOS/Linux 2.x platform supported
+
+Version 0.3:
+  - Added libshout2 support.
+  - Many bugfixes
+  - Stronger configuration file parser
+  - Support for Icecast-1.3.21/Icecast-2.0/Shoutcast server
+  - Removed ICY_COMPAT option cause is useless
+
+Version 0.1:
+  - Initial release

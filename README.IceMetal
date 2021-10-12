@@ -1,0 +1,165 @@
+This is main brand new feature added to IceGenerator, and it's called IceMetaL.
+Formerly it's a simple programming language that I've created, and it's used
+to customize META informations that appear on client software.
+
+
+===== IceMetaL LANGUAGE =====
+
+Its constructs are very simple. They are two:
+
+- LOOP .. ENDLOOP: declares a loop like C/C++ do..while
+- PRINT: send a META string to client
+
+Let's make an example.
+
+  PRINT "Here I am before loop"
+  LOOP 3
+    PRINT "This is a loop"
+  ENDLOOP
+  PRINT "Here I am after loop"
+  
+The META sequence that IceGenerator sends is:
+
+  Here I am before loop
+  This is a loop
+  This is a loop
+  This is a loop
+  This is a loop
+  Here I am after loop
+  
+Really simple, I think. Let's explain every instruction.
+
+* PRINT ("string" | ID3_TAG)
+
+  PRINT is used to send a META to client. It requires a parameter that can be:
+  - a fixed string enclosed by double quotes
+  - an ID3 tag of the file that is in streaming. The ID3 tag allowed are:
+  
+     ID3COMMENT
+     ID3ALBUM
+     ID3COMPOSER
+     ID3COPYRIGHT
+     ID3ENCODEDBY
+     ID3LYRICIST
+     ID3TITLE
+     ID3SUBTITLE
+     ID3LEADARTIST
+     ID3BAND
+     ID3CONDUCTOR
+     ID3PUBLISHER
+     ID3NETRADIOSTATION
+     ID3NETRADIOOWNER
+     ID3USERTEXT
+     ID3TERMSOFUSE
+     
+  Examples:
+  
+    PRINT "This is a test string"
+    
+      Sends 'This is a test string' to client
+      
+    PRINT ID3TITLE
+    
+      Sends song's ID3 Title tag to client (if exists)
+      
+
+
+* LOOP [number]
+
+  This instruction starts a loop. It can be followed by an integer positive
+  number that specifies how many times we have to loop again. Remember that
+  number specifies OTHER passed before the first pass, so if you specify 3,
+  for example, it will make the first pass and loop again 3 times.
+  If number is not specified, the loop is an infinite loop (that is, will
+  loop until song is played).
+  
+* ENDLOOP
+
+  It closes a loop.
+  Loops can be nested (limit is 20 nested loops).
+
+
+Let's make a final example.
+
+LOOP
+  PRINT "This is a global test"
+  PRINT ID3LEADARTIST
+  LOOP 4
+    PRINT "This is an inner loop"
+    PRINT ID3TITLE
+  ENDLOOP
+ENDLOOP
+
+This sends this sequence:
+
+  "This is a global test"
+  Song's ID3 artist tag
+  "This is an inner loop"
+  Song's ID3 title tag
+  "This is an inner loop"
+  Song's ID3 title tag
+  "This is an inner loop"
+  Song's ID3 title tag
+  "This is an inner loop"
+  Song's ID3 title tag
+  "This is an inner loop"
+  Song's ID3 title tag
+  "This is a global test"
+  Song's ID3 artist tag
+  "This is an inner loop"
+  Song's ID3 title tag
+  
+  and so on, until song is finished.
+
+
+
+===== IceMetaL MetaDataFile =====
+
+MetaDataFile is a file that contain IceMetaL code for your song. It must have
+"mdf" extension.
+
+How it works? Let's make an example.
+
+Suppose that your songs are placed into /home/john/streams.
+
+Here you have two subdirs, "Madonna" and "Jackson".
+
+This is your directory layout:
+
+/home
+  /john
+    myglobalfile.mdf
+    /streams
+      Genesis - Invisible touch.mp3
+      REM - Shiny happy people.mp3
+      /Madonna
+        Like a virgin.mp3
+        Like a virgin.mdf
+        Borderline.mp3
+      /Jackson
+        default.mdf
+        Billy Jean.mp3
+        Smooth Criminal.mp3
+        Bad.mp3
+        Bad.mdf
+        
+
+You have set MDFPATH variabile in icegenerator.conf to /home/john/myglobalfile.mdf
+
+When IceGenerator fetchs a songs, it looks for an .mdf file that have the same
+name of song. If exists, it uses it, otherwise it looks for a "default.mdf" file
+placed into the same dir of song. If a local .mdf file can't be found, it uses
+global .mdf specified with MDFPATH variable. If a global .mdf file isn't set,
+filename (without .mp3 or .ogg extension and path) will be sent.
+
+So these are .mdf file for our songs:
+
+  Genesis - Invisible touch.mp3               myglobalfile.mdf
+  REM - Shiny happy people.mp3                myglobalfile.mdf
+  Like a virgin.mp3                           Like a virgin.mdf
+  Borderline.mp3                              myglobalfile.mdf
+  Billy Jean.mp3                              default.mdf
+  Smooth Criminal.mp3                         default.mdf
+  Bad.mp3                                     Bad.mdf
+  
+In this way, you can fine customize your META settings.

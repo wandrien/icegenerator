@@ -1,0 +1,212 @@
+IceGenerator 0.5.5-pre1 - README
+
+IceGenerator is a direct streaming generator for Icecast/Shoutcast. It runs as a daemon.
+Three child processes handle all the stuff. A fourth (optional) child cares about
+telnet communication.
+Main idea for this program is radio automation on a Icecast/Shoutcast server. If you have
+many server processes and CPU saving is your priority, u can use IceGenerator.
+Obviously mp3s/oggs will be already resampled to allow their streaming on your bandwidth
+capability.
+
+This is a pre-realease version, cause many big changes are in progress. I'd like
+that you can test it along its development.
+
+============ FEATURES/LIMITATIONS ============
+* Automatically put into playlist directories full of mp3s, or a MySQL table
+* No resampling is allowed, so CPU is saved.
+* MP3s/OGGs are played randomly or in alphabetic order, without repeating twice a song.
+  You can loop the whole playlist at its end.
+* When IceGenerator quits, finish its last song first.
+* IceGenerator status is optionally reported to syslog/log file.
+* Very useful when used with crond.
+* ID3 support
+
+============ REQUIREMENTS ============
+* Linux 2.x/FreeBSD/NetBSD/MacOS/Solaris/OpenBSD.
+* You have to install libshout2. You can find it at http://www.icecast.org/download.html.
+* For ID3 support, you have to install id3lib. You can find it at http://id3lib.sourceforge.net
+* An IceCast/Shoutcast server.
+* An Intel 486-like CPU class (maybe a fast 386-like will work).
+* A good broadband connection.
+
+
+============ INSTALL ============
+Just type:
+
+./configure
+make
+make install
+
+Configure options:
+  --with-id3      adds ID3 support
+  --with-mysql    adds MySQL support
+  --with-pgsql    adds PostGreSQL support
+
+Binary is installed in /usr/local/bin as default. 
+It requires a configuration file, located in /usr/local/etc as default,
+that indicates mp3s/oggs paths and all the stuff related to connection to Icecast.
+A sample configuration file is in etc/ directory of this package.
+All mp3s MUST HAVE .mp3 extension, and oggs MUST HAVE .ogg extension. Case is
+irrilevant.
+
+Configure your streaming server properly. The default user for Icecast-2.0 is "source",
+but you can change as you want. You can also set a mount point different from "/", so you
+an many instances of icegenerator at once (each one with a different mount point, obviously).
+
+Then type "icegenerator" and put on your stream player (like XMMS). If you can't
+hear music, maybe your volume is too low :-D
+
+More options (like icegenerator.conf path, deamon start) are available
+at command line. Type "icegeneator -h" for synopsys.
+
+To quit this daemon, just run "killall icegenerator", and wait for last
+song to finish.
+
+Really simple, uh?
+
+NOTE:
+Some players (like WinAmp, XMMS, etc.) requires a valid mount point for OGG files. They
+need .OGG extension, cause MIME header isn't evaluated. Keep in mind it ...
+
+
+============ CONFIGURATION ============
+All configuration options are listed in icegenerator.conf file that usually
+resides in /usr/local/etc of your sistem.
+
+Each line that starts with a '#' is treated as a comment.
+
+*** Server section ***
+All option in server section are required.
+
+- IP: Specify here your IceCast/ShoutCast server IP
+- PORT: Specify here your IceCast/ShoutCast server port
+- SERVER: Specify what protocol your IceCast/ShoutCast uses. Refer to your
+  stream server documentation for further details. Only two protocols are
+  supported, ICY and HTTP.
+- MOUNT: Specify mount point for clients, that is where they find your stream
+  server in http path. For example, setting MOUNT as /my_stream requires that
+  clients use URL http://your_server:your_port/my_stream. REMEMBER TO SET A VIRTUAL
+  MOUNT POINT HERE FOR OGG STREAMING. MANY PLAYERS (LIKE WINAMP, XMMS, ETC.) CAN'T
+  AUTO RECOGNIZE OGG STREAMING WITHOUT .OGG EXTENSION
+ 
+*** User section ***
+All option in user section are required.
+
+- USER: Specify which user has streaming rights. As far as I know, IceCast uses
+  "source" as default, but u can use anything else, cause it's ignored. However
+  you can find more informations in your stream server documentation.
+- PASSWORD: Specify password to connect to your stream server.
+
+*** File and playlist section ***
+All option in file and playlist section are required.
+
+- FORMAT: Specify what type of audio data are you going to stream. Only MP3 and OGG
+  files are allowed. Use "0" for OGG, "1" for MP3.
+- MP3PATH: Here is one of strong point of IceGenerator, its capability to accept
+  many ways to search for audio songs. First three chars of this variable specify
+  where are your audio songs, use "PTH" for directories, "SQL" for a MySQL table
+  (only allowed if MySQL support is enabled during compilation), "PQL" for a PostGreSQL
+  table (only allowed if PostGreSQL support is enabled during compilation), "PLS" for .PLS
+  playlist file support, "M3U" for .M3U playlist file support. After a ':' character,
+  you can specify all option that refers to way that you have chosen.
+  + PTH case: you can specify one or more directories separated with ';'. Wrong paths
+    will be skipped.
+  + PQL/SQL case: you have to specify these informations separated with ';' in the
+    following order:
+    % host: your SQL server ip or symbolic name.
+	  % port: your SQL server port. If you specify "0", default port will be used.
+	  % user: SQL user that has access rights to database that you'll specify. Only
+	    SELECT right is required.
+	  % password: password for SQL user.
+	  % database: database name that contains table that contains audio songs paths.
+		% table: table name that contains audio songs paths.
+		% field: field name that contains audio songs paths.
+  + M3U/PLS case: you have to specify only a playlist file path.
+		
+	Examples:
+	+ You have two directories full of OGG files, /path1/dir and /my_audio/rock/80s.
+	  MP3PATH=pth:/path1/dir;/my_audio/rock/80s
+	
+	+ You have a MySQL server located at sql.mydomain.com, you have a database called
+	  webextra with a table called songsdata and a column called songs. MySQL user
+		that has access rights is called john.
+		MP3PATH=sql:sql.mydomain.com;0;john;secretpassword;webextra;songsdata;songs
+
+- RECURSIVE: When this variable is set to 1, IceGenerator search for audio songs
+  in subdirectories of directories specified in MP3PATH. Obviously, it is ignored
+	when you use MySQL as source data.
+	
+- DUMPFILE: Specify a file where stream is saved. 
+
+- LOOP: If set, playlist is looped at its end.
+
+- SHUFFLE: If set, playlist is played randomly.
+
+*** Information section ***
+- NAME:
+- GENRE:
+- DESCRIPTION:
+- URL: Specify name, genre, description and URL of your stream.
+
+- BITRATE: Specify bitrate of your stream. This value is purely informational,
+  it doesn't affect real bitrate.
+	
+- PUBLIC: If set, your URL is published into stream directory server(s).
+
+- METAUPDATE: Specify delay (in seconds) between META information update that
+  is sent to clients. A value of "0" disables META information change, and
+  only NAME value is displayed.
+
+- MDFPATH: Specify path of your global MetaDataFile. See README.IceMetal
+  for more info.
+	
+*** Debug and logging information ***
+- LOG: Specify logging type. "0" means no logging at all, "1" logs to system
+  log daemon, "2" logs to /var/log/icegenerator.log.
+	
+*** Telnet interface ***
+- DATAPORT: Specify port used for telnet interface. If not specified at all,
+  telnet interface will be disabled. A value of "0" sets default port (8796).
+	
+
+============ TELNET INTERFACE ============
+You can connect to IceGenerator during stream with a TCP connection like telnet.
+Connection port is specified with DATAPORT option. After command is sent, an
+answer is returned and connection is closed. Commands that not require an answer
+have an "OK" string in return. All commands MUST HAVE a '.' character at their end.
+Available commands are:
+- TRACK: returns information about current track.
+- LOOP: returns "1" or "0" if loop is active or not.
+- SHUFFLE: returns "1" or "0" if shuffle is active or not.
+- LOOPON: activates loop.
+- LOOPOFF: deactivates loop.
+- SHUFFLEON: activates shuffle.
+- SHUFFLEOFF: deactivates shuffle.
+
+More commands will be available in future.
+
+============ ID3 AND ICEMETAL ============
+See README.IceMetal for info.
+
+
+============ ACKNOWLEDGEMENTS ============
+I'd to thank
+
+  - DIeMONd
+  - TSx7 (alias techtonik)
+  - Stefani Banerian
+  - Michel Hendriks
+  - Jacob Brandup
+  - Patrick Atlas
+  
+for help me fixing bugs and suggesting more features.
+
+Many thanks also to SourceForge, FreshMeat, Berlios, SourceWell, IceWalkers for
+hosting and promoting this project.
+
+
+============ CONTACT ============
+For all suggestion and bug reporting, write to administrator@tortugalabs.it.
+
+
+GOOD LISTENING!!!!!!!

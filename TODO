@@ -1,0 +1,5 @@
+* A stable release :-)
+* Pipe control
+* Add __THROW #define to avoid problem on DEBIAN distributions
+* Remove semaphores, better use POSIX mutexes
+*
