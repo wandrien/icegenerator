@@ -113,8 +113,8 @@ struct ID3TableType ID3Table[MAX_ID3_TAGS] = { { ID3FID_COMMENT, "ID3COMMENT" },
                                                { ID3FID_USERTEXT, "ID3USERTEXT" },
                                                { ID3FID_TERMSOFUSE, "ID3TERMSOFUSE" } };
 #endif
-                                             
-cDoubleLinkedItem::cDoubleLinkedItem(const char *buf, unsigned char ofs)
+
+cDoubleLinkedItem::cDoubleLinkedItem(const char *buf)
 {
   Data = NULL;
   Prev = Next = NULL;
@@ -129,9 +129,7 @@ cDoubleLinkedItem::cDoubleLinkedItem(const char *buf, unsigned char ofs)
     }
   #endif
 
-  Data = new char[strlen(buf)+1];
-  strcpy(Data,buf);
-  offset = ofs;
+  SetData(buf);
 }
 
 cDoubleLinkedItem::~cDoubleLinkedItem()
@@ -188,14 +186,19 @@ char *cDoubleLinkedItem::GetData() const
   return Data;
 }
 
-void cDoubleLinkedItem::SetData(const char *buf, unsigned char ofs)
+void cDoubleLinkedItem::SetData(const char *buf)
 {
   if (Data != NULL)
     delete [] Data;
-  
+
+  int i;
+  for (i = strlen(buf)-1; ((i >= 0) && (buf[i] != '/')); i--);
+  if (i == -1)
+    i = 0;
+
   Data = new char[strlen(buf)+1];
   strcpy(Data,buf);
-  offset = ofs;
+  offset = i;
 }
 
 #ifdef HAVE_ID3
@@ -303,15 +306,7 @@ void cCircularList::Insert(cDoubleLinkedItem *object)
 
 void cCircularList::Insert(const char *buf)
 {
-  int i;
-
-  cDoubleLinkedItem *item;
-
-  for (i = strlen(buf)-1; ((i >= 0) && (buf[i] != '/')); i--);
-  if (i == -1)
-    i = 0;
-    
-  item = new cDoubleLinkedItem(buf,((unsigned char) i));
+  cDoubleLinkedItem *item = new cDoubleLinkedItem(buf);
   Insert(item);
   #ifdef HAVE_ID3
     item->LoadID3();

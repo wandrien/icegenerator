@@ -63,13 +63,13 @@ class cDoubleLinkedItem
 {
   cDoubleLinkedItem *Prev;
   char *Data;
-  unsigned char offset;
+  int offset;
   cDoubleLinkedItem *Next;
   #ifdef HAVE_ID3
     struct ID3TableType ID3[MAX_ID3_TAGS];
   #endif
 public:
-  cDoubleLinkedItem(const char *buf, unsigned char ofs = '\0');
+  cDoubleLinkedItem(const char *buf);
   ~cDoubleLinkedItem();
   void ConnectBefore(cDoubleLinkedItem *object);
   void ConnectAfter(cDoubleLinkedItem *object);
@@ -78,7 +78,7 @@ public:
   void GetPath(char *buf);
   void GetFile(char *buf);
   char *GetData() const;
-  void SetData(const char *buf, unsigned char ofs = '\0');
+  void SetData(const char *buf);
   #ifdef HAVE_ID3
     void LoadID3();
     char *GetID3String(int i);
