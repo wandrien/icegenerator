@@ -73,8 +73,13 @@ void *player(void *arg)
       file_id = open(ready_obj->GetData(),O_RDONLY,0);
       if (file_id != -1)
       {
-        while ((bytes = read(file_id,buf,SHOUT_BUFFER_LENGTH)))
+        while ((bytes = read(file_id,buf,SHOUT_BUFFER_LENGTH))) {
           stream_obj->Play((unsigned char *) buf,bytes);
+          if (quit_now) {
+            time_to_quit = true;
+            break;
+          }
+        }
         close(file_id);
       }
       else

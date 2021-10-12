@@ -160,6 +160,12 @@ void *data_server(void *arg)
           time_to_quit = true;
           strcpy(int_buf,"OK");
         }
+        else if (!strcmp(int_buf,"QUITNOW"))
+        {
+          log_obj->printf("Received QUITNOW command.");
+          quit_now = true;
+          strcpy(int_buf,"OK");
+        }
         else if (!strcmp(int_buf,"LOOP"))
         {
           if (conf_obj->GetValue(CONFIG_LOOP) != NULL)

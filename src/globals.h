@@ -49,6 +49,7 @@ extern cCircularList *ready_obj, *played_obj;
 extern cSemaphore *sem_obj;
 extern int track_load, end_track, data_mutex, start_meta;
 extern volatile bool time_to_quit;
+extern volatile bool quit_now;
 extern bool ok_to_end, changed;
 
 #endif

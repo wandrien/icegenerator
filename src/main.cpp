@@ -172,6 +172,7 @@ cCircularList *ready_obj = NULL, *played_obj = NULL;
 cSemaphore *sem_obj = NULL;
 int track_load, end_track, data_mutex, start_meta;
 volatile bool time_to_quit = false;
+volatile bool quit_now = false;
 bool ok_to_end = false, changed = false;
 char ErrStr[127] = "Unknown error";
 

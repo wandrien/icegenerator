@@ -164,6 +164,8 @@ LOGPATH=/var/log/icegenerator.log
 #           Turns off shuffle
 #      QUIT
 #           Quit after current track
+#      QUITNOW
+#           Quit immediately
 #
 # DATAPORT is used to specify telnet port. If not specified, telnet
 # interface will be disabled. If 0, 8796 (default port) will be used.

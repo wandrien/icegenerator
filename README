@@ -183,6 +183,7 @@ Available commands are:
 - SHUFFLEON: activates shuffle.
 - SHUFFLEOFF: deactivates shuffle.
 - QUIT: quit after current track.
+- QUITNOW: quit immediately.
 
 More commands will be available in future.
 
