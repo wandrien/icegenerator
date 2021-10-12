@@ -24,6 +24,8 @@ AC_LANG_CPLUSPLUS
 AC_PROG_MAKE_SET
 AC_PROG_LN_S
 
+CXXFLAGS="$CXXFLAGS -std=c++11"
+
 dnl debug check
 AC_ARG_ENABLE(debug,
   [  --enable-debug          enable debug (default disabled)],
