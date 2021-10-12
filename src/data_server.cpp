@@ -76,127 +76,151 @@
 
 void *data_server(void *arg)
 {
-  int my_sock, ext_sock;
+  int my_sock = 0, ext_sock;
   socklen_t len;
   struct sockaddr_in from, sin;
   char *int_buf;
-  
+
   sig_obj->Block();
-  
+
   int_buf = new char[INTERNAL_BUF_SIZE];
-	
-  if (conf_obj->GetValue(CONFIG_DATAPORT) != NULL)
+
+  const char * error_at_stage = NULL;
+
+  if (conf_obj->GetValue(CONFIG_DATAPORT) == NULL) {
+    log_obj->printf("Telnet interface is disabled");
+    goto out;
+  }
+
+  memset(&sin, 0, sizeof(sin));
+  sin.sin_family = AF_INET;
+  sin.sin_port = htons(conf_obj->GetIntValue(CONFIG_DATAPORT, 0));
+  if (!sin.sin_port)
+    sin.sin_port = 8796;
+  sin.sin_addr.s_addr = htonl(INADDR_ANY);
+
+  my_sock = socket(AF_INET, SOCK_STREAM, 0);
+  if (my_sock == -1) {
+    error_at_stage = "Socket error";
+    goto out;
+  }
+
+  if (bind(my_sock,(struct sockaddr *) &sin, sizeof sin) == -1) {
+    error_at_stage = "Can't bind to specified port";
+    goto out;
+  }
+
+  if (listen(my_sock, 1) == -1) {
+    error_at_stage = "Can't listen on specified port";
+    goto out;
+  }
+
+  log_obj->printf("Telnet interface is enabled");
+  while (!ok_to_end)
   {
-    memset(&sin, 0, sizeof(sin));
-    sin.sin_family = AF_INET;
-    sin.sin_port = htons(conf_obj->GetIntValue(CONFIG_DATAPORT, 0));
-    if (!sin.sin_port)
-      sin.sin_port = 8796;
-    sin.sin_addr.s_addr = htonl(INADDR_ANY);
-    if ((my_sock	= socket(AF_INET, SOCK_STREAM, 0)) == -1)
-      log_obj->WriteLog("Socket error. Telnet interface not available");
-    else if (bind(my_sock,(struct sockaddr *) &sin, sizeof sin) == -1)
-      log_obj->WriteLog("Can't bind to specified port");
-    else
+    int buf_len, i;
+    bool dot_found = false;
+
+    len = sizeof from;
+    ext_sock = accept(my_sock, (struct sockaddr *) &from, &len);
+
+    if (!ok_to_end)
     {
-      if (listen(my_sock, 1) == -1)
-        log_obj->WriteLog("Cannot listen on specified port");
-      else
-        while (!ok_to_end)
+      log_obj->WriteLog("Connected to client ",inet_ntoa(from.sin_addr));
+
+      buf_len = read(ext_sock,int_buf,INTERNAL_BUF_SIZE);
+      int_buf[buf_len+1] = '\0';
+      for (i = 0; i < buf_len; i++)
+      {
+        if (int_buf[i] == '.')
         {
-          int buf_len, i;
-          bool dot_found = false;
-
-          len = sizeof from;
-          ext_sock = accept(my_sock, (struct sockaddr *) &from, &len);
-          
-          if (!ok_to_end)
-          {
-            log_obj->WriteLog("Connected to client ",inet_ntoa(from.sin_addr));
-
-            buf_len = read(ext_sock,int_buf,INTERNAL_BUF_SIZE);
-            int_buf[buf_len+1] = '\0';
-            for (i = 0; i < buf_len; i++)
-              if (int_buf[i] == '.')
-              {
-                int_buf[i] = '\0';
-                dot_found = true;
-              }
-              else
-                int_buf[i] = toupper(int_buf[i]);
-
-            if ((buf_len > 0) && dot_found)
-            {
-              if (!strcmp(int_buf,"TRACK"))
-              {
-                sem_obj->Wait(data_mutex);
-                ready_obj->GetFile(int_buf);
-                sem_obj->Signal(data_mutex);
-
-                int_buf[strlen(int_buf)-4] = '\0';
-                log_obj->WriteLog("Received TRACK command, releasing information...");
-              }
-              else if (!strcmp(int_buf,"QUIT"))
-              {
-                signal_termination_proc(0);
-                strcpy(int_buf,"OK");
-              }
-              else if (!strcmp(int_buf,"LOOP"))
-              {
-                if (conf_obj->GetValue(CONFIG_LOOP) != NULL)
-                  strcpy(int_buf,conf_obj->GetValue(CONFIG_LOOP));
-                else
-                  strcpy(int_buf,"1");
-                log_obj->WriteLog("Received LOOP command, releasing information...");
-              }
-              else if (!strcmp(int_buf,"LOOPON"))
-              {
-                conf_obj->SetValue(CONFIG_LOOP,"1");
-                log_obj->WriteLog("LOOP enabled");
-                strcpy(int_buf,"OK");
-              }
-              else if (!strcmp(int_buf,"LOOPOFF"))
-              {
-                conf_obj->SetValue(CONFIG_LOOP,"0");
-                log_obj->WriteLog("LOOP disabled");
-                strcpy(int_buf,"OK");
-              }
-              else if (!strcmp(int_buf,"SHUFFLE"))
-              {
-                if (conf_obj->GetValue(CONFIG_SHUFFLE) != NULL)
-                  strcpy(int_buf,conf_obj->GetValue(CONFIG_SHUFFLE));
-                else
-                  strcpy(int_buf,"1");
-                log_obj->WriteLog("Received SHUFFLE command, releasing information...");
-              }
-              else if (!strcmp(int_buf,"SHUFFLEON"))
-              {
-                conf_obj->SetValue(CONFIG_SHUFFLE,"1");
-                log_obj->WriteLog("SHUFFLE enabled");
-                strcpy(int_buf,"OK");
-              }
-              else if (!strcmp(int_buf,"SHUFFLEOFF"))
-              {
-                conf_obj->SetValue(CONFIG_SHUFFLE,"0");
-                log_obj->WriteLog("SHUFFLE disabled");
-                strcpy(int_buf,"OK");
-              }
-              else
-                dot_found = false;
-            }
-
-            if (!dot_found)
-              strcpy(int_buf,"Unknown command");
-
-            write(ext_sock,int_buf,strlen(int_buf)+1);
-          }
-
-          close(ext_sock);
+          int_buf[i] = '\0';
+          dot_found = true;
         }
+        else
+          int_buf[i] = toupper(int_buf[i]);
+      }
+
+      if ((buf_len > 0) && dot_found)
+      {
+        if (!strcmp(int_buf,"TRACK"))
+        {
+          sem_obj->Wait(data_mutex);
+          ready_obj->GetFile(int_buf);
+          sem_obj->Signal(data_mutex);
+
+          int_buf[strlen(int_buf)-4] = '\0';
+          log_obj->WriteLog("Received TRACK command, releasing information...");
+        }
+        else if (!strcmp(int_buf,"QUIT"))
+        {
+          signal_termination_proc(0);
+          strcpy(int_buf,"OK");
+        }
+        else if (!strcmp(int_buf,"LOOP"))
+        {
+          if (conf_obj->GetValue(CONFIG_LOOP) != NULL)
+            strcpy(int_buf,conf_obj->GetValue(CONFIG_LOOP));
+          else
+            strcpy(int_buf,"1");
+          log_obj->WriteLog("Received LOOP command, releasing information...");
+        }
+        else if (!strcmp(int_buf,"LOOPON"))
+        {
+          conf_obj->SetValue(CONFIG_LOOP,"1");
+          log_obj->WriteLog("LOOP enabled");
+          strcpy(int_buf,"OK");
+        }
+        else if (!strcmp(int_buf,"LOOPOFF"))
+        {
+          conf_obj->SetValue(CONFIG_LOOP,"0");
+          log_obj->WriteLog("LOOP disabled");
+          strcpy(int_buf,"OK");
+        }
+        else if (!strcmp(int_buf,"SHUFFLE"))
+        {
+          if (conf_obj->GetValue(CONFIG_SHUFFLE) != NULL)
+            strcpy(int_buf,conf_obj->GetValue(CONFIG_SHUFFLE));
+          else
+            strcpy(int_buf,"1");
+          log_obj->WriteLog("Received SHUFFLE command, releasing information...");
+        }
+        else if (!strcmp(int_buf,"SHUFFLEON"))
+        {
+          conf_obj->SetValue(CONFIG_SHUFFLE,"1");
+          log_obj->WriteLog("SHUFFLE enabled");
+          strcpy(int_buf,"OK");
+        }
+        else if (!strcmp(int_buf,"SHUFFLEOFF"))
+        {
+          conf_obj->SetValue(CONFIG_SHUFFLE,"0");
+          log_obj->WriteLog("SHUFFLE disabled");
+          strcpy(int_buf,"OK");
+        }
+        else
+          dot_found = false;
+      }
+
+      if (!dot_found)
+        strcpy(int_buf,"Unknown command");
+
+      write(ext_sock,int_buf,strlen(int_buf)+1);
     }
 
-    close(my_sock);
+    close(ext_sock);
   }
+
+out:
+
+  if (error_at_stage) {
+    log_obj->WriteLog("%s. Telnet interface not available.", error_at_stage);
+  }
+
+  if (int_buf)
+    delete int_buf;
+
+  if (my_sock > 0)
+    close(my_sock);
 
   return NULL;
 }
