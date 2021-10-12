@@ -152,6 +152,7 @@
 #include "circular.h"
 #include "synch.h"
 #include "main.h"
+#include "utils.h"
 
 #define HELP_MSG_LINES 8
 
@@ -176,8 +177,11 @@ char ErrStr[127] = "Unknown error";
 
 void signal_termination_proc(const int sig)
 {
-  if (!time_to_quit)
-    log_obj->WriteLog("Wait for all child process to terminate...");
+  if (!time_to_quit) {
+    char * signal_name = m_strsignal2(sig);
+    log_obj->printf("Got signal %s. Waiting for all child processes to terminate...", signal_name);
+    free(signal_name);
+  }
   time_to_quit = true;
 }
 
