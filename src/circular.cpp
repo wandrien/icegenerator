@@ -323,8 +323,11 @@ cDoubleLinkedItem * cCircularList::Remove()
   cDoubleLinkedItem *temp = Ptr;
 
   if (Ptr != NULL)
+  {
     if (Ptr->GetPrevious() == Ptr)
+    {
       Ptr = NULL;
+    }
     else
     {
       Ptr->GetPrevious()->ConnectAfter(Ptr->GetNext());		// bypass upper link
@@ -333,6 +336,7 @@ cDoubleLinkedItem * cCircularList::Remove()
       temp->ConnectBefore(NULL);				// detach object from chain
       temp->ConnectAfter(NULL);
     }
+  }
 
   return temp;
 }
