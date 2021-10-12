@@ -623,7 +623,7 @@ void cCircularList::ParsePlayList(cConfig *object)
   int i = 0, strs_ind = 1;
 	
   parsed_strs[0] = new char[4];
-  strcpy(parsed_strs[0],strtok(object->GetValue(_mp3path),":"));
+  strcpy(parsed_strs[0],strtok(object->GetValue(CONFIG_MP3PATH),":"));
   while ((parsed_strs[0][i] = toupper(parsed_strs[0][i])))
     i++;
 	
@@ -637,7 +637,7 @@ void cCircularList::ParsePlayList(cConfig *object)
   {
     for (i = 1; i < strs_ind; i++)
       if (stat(parsed_strs[i],&temp_stat) != -1)
-        FillWithPath(parsed_strs[i],((atoi(object->GetValue(_format)))? _mp3 : _ogg),((object->GetValue(_recurse) != NULL) && atoi(object->GetValue(_recurse))));
+        FillWithPath(parsed_strs[i],((atoi(object->GetValue(CONFIG_FORMAT)))? _mp3 : _ogg),((object->GetValue(CONFIG_RECURSIVE) != NULL) && atoi(object->GetValue(CONFIG_RECURSIVE))));
   }
   else if (!strcmp(parsed_strs[0],"SQL"))
   {

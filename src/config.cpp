@@ -57,30 +57,35 @@
 
 #include "config.h"
 
-char *keys[MAX_KEYS] = { "IP", "PORT", "MOUNT", "PASSWORD", "SERVER", "NAME", "GENRE",
-                         "DESCRIPTION", "URL", "BITRATE", "PUBLIC", "DUMPFILE", "MP3PATH",
-                         "FORMAT", "LOG", "SOURCE", "LOOP", "RECURSIVE", "SHUFFLE", "METAUPDATE",
-                         "DATAPORT", "LOGPATH", "MDFPATH" };
+static const char * keys[MAX_KEYS] = {
+    #define CONFIG_KEY_FIRST(key) #key,
+    #define CONFIG_KEY(key) #key,
+    #define CONFIG_KEY_LAST(key) #key
+    #include "config_keys.h"
+    #undef CONFIG_KEY_FIRST
+    #undef CONFIG_KEY
+    #undef CONFIG_KEY_LAST
+};
 
 cConfig::cConfig(const char *path)
 {
   int i;
   FILE *fp = fopen(path,"r");
 
-  for (i = ((int) _ip); i < ((int) _badkey); Table[i++] = NULL);
+  for (i = ((int) CONFIG_IP); i < ((int) CONFIG_BADKEY); Table[i++] = NULL);
 
   int_buf = new char[INTERNAL_BUF_SIZE];
   
   if (fp != NULL)
   {
     char *key, *value;
-    key_type _key;
+    config_key_type _key;
 
     key = new char[64];
     value = new char[127];
   
     while (fgets(int_buf,511,fp) != NULL)
-      if (!ParseLine(int_buf,key,value) && ((_key = LookupKey(key)) != _badkey))
+      if (!ParseLine(int_buf,key,value) && ((_key = LookupKey(key)) != CONFIG_BADKEY))
         SetValue(_key,value);
 
     fclose(fp);
@@ -99,29 +104,29 @@ cConfig::~cConfig()
 {
   int i;
 
-  for (i = ((int) _ip); i < ((int) _badkey); i++)
+  for (i = ((int) CONFIG_IP); i < ((int) CONFIG_BADKEY); i++)
     if (Table[i] != NULL)
       delete [] Table[i];
     
   delete [] int_buf;
 }
 
-key_type cConfig::LookupKey(const char *key) const
+config_key_type cConfig::LookupKey(const char *key) const
 {
   int result;
 
-  for (result = ((int) _ip); (result < ((int) _badkey)) && (strcmp(key,keys[result])); result++);
+  for (result = ((int) CONFIG_IP); (result < ((int) CONFIG_BADKEY)) && (strcmp(key,keys[result])); result++);
 
-  if (result == _badkey)
+  if (result == CONFIG_BADKEY)
   {
     strcpy(ErrStr,"Invalid configuration parameter in config file");
     throw 0;
   }
   else
-    return ((key_type) result);
+    return ((config_key_type) result);
 }
 
-void cConfig::SetValue(key_type key, const char *value)
+void cConfig::SetValue(config_key_type key, const char *value)
 {
   if ((value != NULL) && (strlen(value) > 0))
   {
@@ -137,7 +142,7 @@ void cConfig::SetValue(key_type key, const char *value)
   }
 }
 
-char * cConfig::GetValue(key_type key) const
+char * cConfig::GetValue(config_key_type key) const
 {
   return Table[key];
 }

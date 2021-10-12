@@ -72,13 +72,13 @@ cLog::cLog(cConfig *object)
 {
   int_buf = new char[INTERNAL_BUF_SIZE];
 
-  switch (LogSelected = ((log_type) atoi(object->GetValue(_log))))
+  switch (LogSelected = ((log_type) atoi(object->GetValue(CONFIG_LOG))))
   {
     case _none: break;
     case _system: openlog("Icecast Generator",LOG_PID,LOG_USER);
                   break;
-    case _file: if (object->GetValue(_logpath) != NULL)
-                  strcpy(int_buf,object->GetValue(_logpath));
+    case _file: if (object->GetValue(CONFIG_LOGPATH) != NULL)
+                  strcpy(int_buf,object->GetValue(CONFIG_LOGPATH));
                 else
                   strcpy(int_buf,"/var/log/icegenerator.log");
                 if ((LogFp = fopen(int_buf,"a")) == NULL)

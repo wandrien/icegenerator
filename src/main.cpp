@@ -298,7 +298,7 @@ int main(int argc, char **argv)
     pthread_create(&player_tid,NULL,player,NULL);
     pthread_create(&data_streamer_tid,NULL,data_streamer,NULL);
     pthread_create(&selector_tid,NULL,selector,NULL);
-    if (conf_obj->GetValue(_dataport) != NULL)
+    if (conf_obj->GetValue(CONFIG_DATAPORT) != NULL)
       pthread_create(&data_server_tid,NULL,data_server,NULL);
 
     /* Doesn't care about SIGS */
@@ -309,7 +309,7 @@ int main(int argc, char **argv)
     pthread_join(data_streamer_tid,NULL);
     pthread_join(selector_tid,NULL);
 	
-    if (conf_obj->GetValue(_dataport) != NULL)
+    if (conf_obj->GetValue(CONFIG_DATAPORT) != NULL)
     {
       close_data_server();
       pthread_join(data_server_tid,NULL);

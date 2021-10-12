@@ -67,29 +67,29 @@ cStreamer::cStreamer()
     strcpy(ErrStr,"Not enough memory to init Icecast connection");
     throw 0;
   }
-  Minimal[_ip] = false;			// FALSE = REQUIRED
-  Minimal[_port] = false;
-  Minimal[_mount] = false;
-  Minimal[_password] = false;
-  Minimal[_server] = false;
-  Minimal[_name] = true;
-  Minimal[_genre] = true;
-  Minimal[_description] = true;
-  Minimal[_url] = true;
-  Minimal[_bitrate] = true;
-  Minimal[_public] = true;
-  Minimal[_dumpfile] = true;
-  Minimal[_mp3path] = false;
-  Minimal[_format] = false;
-  Minimal[_log] = true;
-  Minimal[_source] = false;
-  Minimal[_loop] = true;
-  Minimal[_recurse] = true;
-  Minimal[_shuffle] = true;
-  Minimal[_metaupdate] = true;
-  Minimal[_dataport] = true;
-  Minimal[_logpath] = true;
-  Minimal[_mdfpath] = true;
+  Minimal[CONFIG_IP] = false;			// FALSE = REQUIRED
+  Minimal[CONFIG_PORT] = false;
+  Minimal[CONFIG_MOUNT] = false;
+  Minimal[CONFIG_PASSWORD] = false;
+  Minimal[CONFIG_SERVER] = false;
+  Minimal[CONFIG_NAME] = true;
+  Minimal[CONFIG_GENRE] = true;
+  Minimal[CONFIG_DESCRIPTION] = true;
+  Minimal[CONFIG_URL] = true;
+  Minimal[CONFIG_BITRATE] = true;
+  Minimal[CONFIG_PUBLIC] = true;
+  Minimal[CONFIG_DUMPFILE] = true;
+  Minimal[CONFIG_MP3PATH] = false;
+  Minimal[CONFIG_FORMAT] = false;
+  Minimal[CONFIG_LOG] = true;
+  Minimal[CONFIG_SOURCE] = false;
+  Minimal[CONFIG_LOOP] = true;
+  Minimal[CONFIG_RECURSIVE] = true;
+  Minimal[CONFIG_SHUFFLE] = true;
+  Minimal[CONFIG_METAUPDATE] = true;
+  Minimal[CONFIG_DATAPORT] = true;
+  Minimal[CONFIG_LOGPATH] = true;
+  Minimal[CONFIG_MDFPATH] = true;
   
   Connected = false;
 }
@@ -107,69 +107,89 @@ void cStreamer::SetData(cConfig *object)
 {
   int i;
   
-  for (i = ((key_type) _ip); i < ((key_type) _badkey); i++)
+  for (i = ((config_key_type) CONFIG_IP); i < ((config_key_type) CONFIG_BADKEY); i++)
   {
-    if (object->GetValue((key_type) i) != NULL)
+    if (object->GetValue((config_key_type) i) != NULL)
     {
       Minimal[i] = true;
-      switch ((key_type) i)
+      switch ((config_key_type) i)
       {
-        case _ip: shout_set_host(ShoutData,object->GetValue(_ip));
-                  break;
-        case _port: shout_set_port(ShoutData,atoi(object->GetValue(_port)));
-                    break;
-        case _mount: shout_set_mount(ShoutData,object->GetValue(_mount));
-                     break;
-        case _password: shout_set_password(ShoutData,object->GetValue(_password));
-                        break;
-        case _server: switch (atoi(object->GetValue(_server)))
-                      {
-                        case 2: shout_set_protocol(ShoutData,SHOUT_PROTOCOL_HTTP);
-                                break;
-                        case 1: shout_set_protocol(ShoutData,SHOUT_PROTOCOL_ICY);
-                                break;
-                        default: strcpy(ErrStr,"Bad server protocol");
-                                 throw 0;
-                                 break;
-                      }
-                      break;
-        case _name: shout_set_name(ShoutData,object->GetValue(_name));
-                    break;
-        case _genre: shout_set_genre(ShoutData,object->GetValue(_genre));
-                     break;
-        case _description: shout_set_description(ShoutData,object->GetValue(_description));
-                           break;
-        case _url: shout_set_url(ShoutData,object->GetValue(_url));
-                   break;
-        case _bitrate: shout_set_audio_info(ShoutData,SHOUT_AI_BITRATE,object->GetValue(_bitrate));
-                       break;
-        case _public: shout_set_public(ShoutData,atoi(object->GetValue(_public)));
-                      break;
-        case _dumpfile: shout_set_dumpfile(ShoutData,object->GetValue(_dumpfile));
-                        break;
-        case _format: switch (atoi(object->GetValue(_format)))
-                      {
-                        case 0: shout_set_format(ShoutData,SHOUT_FORMAT_VORBIS);
-                                break;
-                        case 1: shout_set_format(ShoutData,SHOUT_FORMAT_MP3);
-                                break;
-		                    default: strcpy(ErrStr,"Bad file format");
-                                 throw 0;
-                                 break;
-                      }
-                      break;
-        case _source: shout_set_user(ShoutData,object->GetValue(_source));
-                      break;
-        case _mp3path:
-        case _log:
-        case _badkey:
-        case _loop: 
-        case _recurse: 
-        case _shuffle: 
-        case _metaupdate: 
-        case _dataport: 
-        case _logpath: 
-        case _mdfpath: break;
+        case CONFIG_IP:
+          shout_set_host(ShoutData,object->GetValue(CONFIG_IP));
+          break;
+        case CONFIG_PORT:
+          shout_set_port(ShoutData,atoi(object->GetValue(CONFIG_PORT)));
+          break;
+        case CONFIG_MOUNT:
+          shout_set_mount(ShoutData,object->GetValue(CONFIG_MOUNT));
+          break;
+        case CONFIG_PASSWORD:
+          shout_set_password(ShoutData,object->GetValue(CONFIG_PASSWORD));
+          break;
+        case CONFIG_SERVER:
+          switch (atoi(object->GetValue(CONFIG_SERVER)))
+          {
+            case 2:
+              shout_set_protocol(ShoutData,SHOUT_PROTOCOL_HTTP);
+              break;
+            case 1:
+              shout_set_protocol(ShoutData,SHOUT_PROTOCOL_ICY);
+              break;
+            default:
+              strcpy(ErrStr,"Bad server protocol");
+              throw 0;
+              break;
+            }
+            break;
+        case CONFIG_NAME:
+          shout_set_name(ShoutData,object->GetValue(CONFIG_NAME));
+          break;
+        case CONFIG_GENRE:
+          shout_set_genre(ShoutData,object->GetValue(CONFIG_GENRE));
+          break;
+        case CONFIG_DESCRIPTION:
+          shout_set_description(ShoutData,object->GetValue(CONFIG_DESCRIPTION));
+          break;
+        case CONFIG_URL:
+          shout_set_url(ShoutData,object->GetValue(CONFIG_URL));
+          break;
+        case CONFIG_BITRATE:
+          shout_set_audio_info(ShoutData,SHOUT_AI_BITRATE,object->GetValue(CONFIG_BITRATE));
+          break;
+        case CONFIG_PUBLIC:
+          shout_set_public(ShoutData,atoi(object->GetValue(CONFIG_PUBLIC)));
+          break;
+        case CONFIG_DUMPFILE:
+          shout_set_dumpfile(ShoutData,object->GetValue(CONFIG_DUMPFILE));
+          break;
+        case CONFIG_FORMAT:
+          switch (atoi(object->GetValue(CONFIG_FORMAT)))
+          {
+            case 0:
+              shout_set_format(ShoutData,SHOUT_FORMAT_VORBIS);
+              break;
+            case 1:
+              shout_set_format(ShoutData,SHOUT_FORMAT_MP3);
+              break;
+            default:
+              strcpy(ErrStr,"Bad file format");
+              throw 0;
+              break;
+          }
+          break;
+        case CONFIG_SOURCE:
+          shout_set_user(ShoutData,object->GetValue(CONFIG_SOURCE));
+          break;
+        case CONFIG_MP3PATH:
+        case CONFIG_LOG:
+        case CONFIG_BADKEY:
+        case CONFIG_LOOP:
+        case CONFIG_RECURSIVE:
+        case CONFIG_SHUFFLE:
+        case CONFIG_METAUPDATE:
+        case CONFIG_DATAPORT:
+        case CONFIG_LOGPATH:
+        case CONFIG_MDFPATH: break;
       }
     }
 
@@ -180,9 +200,9 @@ void cStreamer::SetData(cConfig *object)
     }
   }
 
-  for (i = ((int) _ip); (i < ((int) _badkey)) && Minimal[i]; i++);
+  for (i = ((int) CONFIG_IP); (i < ((int) CONFIG_BADKEY)) && Minimal[i]; i++);
 
-  if (i < ((int) _badkey))
+  if (i < ((int) CONFIG_BADKEY))
   {
     strcpy(ErrStr,"Insufficient parameters to run Icegenerator");
     throw 0;

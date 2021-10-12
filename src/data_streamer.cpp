@@ -54,7 +54,7 @@ void *data_streamer(void *arg)
 {
   sig_obj->Block();
   
-  if ((conf_obj->GetValue(_metaupdate) == NULL) || (atoi(conf_obj->GetValue(_metaupdate)) > 0))
+  if ((conf_obj->GetValue(CONFIG_METAUPDATE) == NULL) || (atoi(conf_obj->GetValue(CONFIG_METAUPDATE)) > 0))
   {
     cMetaDataList *global = NULL, *directory = NULL, *file = NULL, *p = NULL;
     bool loc_changed = false;
@@ -84,10 +84,10 @@ void *data_streamer(void *arg)
       }
     #endif
 
-    if (conf_obj->GetValue(_mdfpath) != NULL)
+    if (conf_obj->GetValue(CONFIG_MDFPATH) != NULL)
     {
       global = new cMetaDataList;
-      global->LoadMeta(conf_obj->GetValue(_mdfpath));
+      global->LoadMeta(conf_obj->GetValue(CONFIG_MDFPATH));
       global->StartMeta();
     }
   
@@ -157,7 +157,7 @@ void *data_streamer(void *arg)
 
       if (strlen(temp_buf) > 0)
         stream_obj->UpdateMetaData(temp_buf);
-      sleep(((conf_obj->GetValue(_metaupdate) != NULL)? atoi(conf_obj->GetValue(_metaupdate)) : 5));
+      sleep(((conf_obj->GetValue(CONFIG_METAUPDATE) != NULL)? atoi(conf_obj->GetValue(CONFIG_METAUPDATE)) : 5));
     }
 
     

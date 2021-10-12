@@ -85,11 +85,11 @@ void *data_server(void *arg)
   
   int_buf = new char[INTERNAL_BUF_SIZE];
 	
-  if (conf_obj->GetValue(_dataport) != NULL)
+  if (conf_obj->GetValue(CONFIG_DATAPORT) != NULL)
   {
     memset(&sin, 0, sizeof(sin));
     sin.sin_family = AF_INET;
-    sin.sin_port = htons(atoi(conf_obj->GetValue(_dataport)));
+    sin.sin_port = htons(atoi(conf_obj->GetValue(CONFIG_DATAPORT)));
     if (!sin.sin_port)
       sin.sin_port = 8796;
     sin.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -142,41 +142,41 @@ void *data_server(void *arg)
               }
               else if (!strcmp(int_buf,"LOOP"))
               {
-                if (conf_obj->GetValue(_loop) != NULL)
-                  strcpy(int_buf,conf_obj->GetValue(_loop));
+                if (conf_obj->GetValue(CONFIG_LOOP) != NULL)
+                  strcpy(int_buf,conf_obj->GetValue(CONFIG_LOOP));
                 else
                   strcpy(int_buf,"1");
                 log_obj->WriteLog("Received LOOP command, releasing information...");
               }
               else if (!strcmp(int_buf,"LOOPON"))
               {
-                conf_obj->SetValue(_loop,"1");
+                conf_obj->SetValue(CONFIG_LOOP,"1");
                 log_obj->WriteLog("LOOP enabled");
                 strcpy(int_buf,"OK");
               }
               else if (!strcmp(int_buf,"LOOPOFF"))
               {
-                conf_obj->SetValue(_loop,"0");
+                conf_obj->SetValue(CONFIG_LOOP,"0");
                 log_obj->WriteLog("LOOP disabled");
                 strcpy(int_buf,"OK");
               }
               else if (!strcmp(int_buf,"SHUFFLE"))
               {
-                if (conf_obj->GetValue(_shuffle) != NULL)
-                  strcpy(int_buf,conf_obj->GetValue(_shuffle));
+                if (conf_obj->GetValue(CONFIG_SHUFFLE) != NULL)
+                  strcpy(int_buf,conf_obj->GetValue(CONFIG_SHUFFLE));
                 else
                   strcpy(int_buf,"1");
                 log_obj->WriteLog("Received SHUFFLE command, releasing information...");
               }
               else if (!strcmp(int_buf,"SHUFFLEON"))
               {
-                conf_obj->SetValue(_shuffle,"1");
+                conf_obj->SetValue(CONFIG_SHUFFLE,"1");
                 log_obj->WriteLog("SHUFFLE enabled");
                 strcpy(int_buf,"OK");
               }
               else if (!strcmp(int_buf,"SHUFFLEOFF"))
               {
-                conf_obj->SetValue(_shuffle,"0");
+                conf_obj->SetValue(CONFIG_SHUFFLE,"0");
                 log_obj->WriteLog("SHUFFLE disabled");
                 strcpy(int_buf,"OK");
               }
@@ -206,7 +206,7 @@ void close_data_server()
 
   memset(&sin, 0, sizeof(sin));
   sin.sin_family = AF_INET;
-  sin.sin_port = htons(atoi(conf_obj->GetValue(_dataport)));
+  sin.sin_port = htons(atoi(conf_obj->GetValue(CONFIG_DATAPORT)));
   if (!sin.sin_port)
     sin.sin_port = 8796;
   sin.sin_addr.s_addr = inet_addr("127.0.0.1");
