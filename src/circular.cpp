@@ -676,3 +676,40 @@ void cCircularList::GetID3Table(struct ID3TableType *ID3t)
 #endif
 
 /* ****************************************************************************** */
+
+#ifdef INSIDE_CATCH
+
+struct PathTestData {
+  const char * fullPath;
+  const char * path;
+  const char * file;
+};
+
+
+TEST_CASE( "cDoubleLinkedItem path parsing") {
+
+  auto testData = GENERATE(
+    PathTestData {"/abc/101", "/abc", "101"},
+    PathTestData {"abc/102", "abc", "102"},
+    PathTestData {"103", "", "103"}
+  );
+
+  cDoubleLinkedItem item(testData.fullPath);
+
+  REQUIRE(std::string(item.GetData()) == testData.fullPath);
+
+  {
+    char file[INTERNAL_BUF_SIZE];
+    item.GetFile(file);
+    REQUIRE(std::string(file) == testData.file);
+  }
+
+  {
+    char path[INTERNAL_BUF_SIZE];
+    item.GetPath(path);
+    REQUIRE(std::string(path) == testData.path);
+  }
+
+}
+
+#endif

@@ -1,4 +1,5 @@
 bin_PROGRAMS = icegenerator
+SUBDIRS = tests
 
 NULL =
 

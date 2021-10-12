@@ -176,4 +176,8 @@ SYSCONFDIR=`eval echo ${sysconfdir}`
 AC_SUBST(SYSCONFDIR)
 AC_DEFINE_UNQUOTED(DEFAULT_CONF_FILE,"`eval echo "${sysconfdir}/icegenerator.conf"`",[Default config file path])
 
-AC_OUTPUT(Makefile src/Makefile)
+AC_OUTPUT(
+  Makefile
+  src/Makefile
+  src/tests/Makefile
+)

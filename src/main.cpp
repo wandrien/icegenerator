@@ -243,7 +243,13 @@ void clean_objs()
     delete log_obj;
 }
 
-int main(int argc, char **argv)
+int
+#ifdef INSIDE_CATCH
+programMain
+#else
+main
+#endif
+(int argc, char **argv)
 {
   int i, c;
   bool is_daemon = true;
@@ -281,16 +287,16 @@ int main(int argc, char **argv)
       const char * action = conf_obj->GetValue(CONFIG_SIGNAL_ACTION);
       if (!action)
         action = "quit";
-      #define CHECK(a) \
+      #define CHECK_ACTION(a) \
         else if (strcasecmp(action, #a) == 0) { \
           signal_action = signal_action_##a; \
         }
       if (0) {}
-      CHECK(ignore)
-      CHECK(quit)
-      CHECK(quitnow)
-      CHECK(quit_now)
-      #undef CHECK
+      CHECK_ACTION(ignore)
+      CHECK_ACTION(quit)
+      CHECK_ACTION(quitnow)
+      CHECK_ACTION(quit_now)
+      #undef CHECK_ACTION
     }
 
     /* Init log file */
