@@ -65,6 +65,7 @@ public:
   cLog(cConfig *object);
   ~cLog();
   void WriteLog(const char *msg, const char *data = NULL);
+  void printf(const char *format...);
 };
 
 #endif

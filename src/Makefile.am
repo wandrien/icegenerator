@@ -1,5 +1,37 @@
 bin_PROGRAMS = icegenerator
 
-icegenerator_SOURCES = circular.cpp log.cpp streamer.cpp sgnl_handler.cpp synch.cpp config.cpp main.cpp selector.cpp data_streamer.cpp data_server.cpp player.cpp meta_parser.cpp
+NULL =
 
-noinst_HEADERS = circular.h log.h streamer.h sgnl_handler.h synch.h config.h player.h data_streamer.h data_server.h main.h selector.h globals.h meta_parser.h
+icegenerator_SOURCES = \
+  circular.cpp \
+  config.cpp \
+  data_server.cpp \
+  data_streamer.cpp \
+  log.cpp \
+  main.cpp \
+  meta_parser.cpp \
+  player.cpp \
+  selector.cpp \
+  sgnl_handler.cpp \
+  streamer.cpp \
+  synch.cpp \
+  utils.cpp \
+  $(NULL)
+
+noinst_HEADERS = \
+  circular.h \
+  config.h \
+  config_keys.h \
+  data_server.h \
+  data_streamer.h \
+  globals.h \
+  log.h \
+  main.h \
+  meta_parser.h \
+  player.h \
+  selector.h \
+  sgnl_handler.h \
+  streamer.h \
+  synch.h \
+  utils.h \
+  $(NULL)

@@ -61,7 +61,10 @@
   #endif
 #endif
 
+#include <stdarg.h>
+
 #include "log.h"
+#include "utils.h"
 
 cLog::cLog()
 {
@@ -112,6 +115,19 @@ void cLog::WriteLog(const char *msg, const char *data)
                   fprintf(LogFp,"%s: %s %s\n",int_buf,msg,data);
                 fflush(LogFp);
                 break;
+  }
+}
+
+void cLog::printf(const char *format...)
+{
+  va_list ap;
+  va_start(ap, format);
+  char * msg = vmake_message(format, ap);
+  va_end(ap);
+
+  if (msg) {
+    WriteLog(msg);
+    free(msg);
   }
 }
 
