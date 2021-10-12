@@ -640,8 +640,13 @@ void cCircularList::ParsePlayList(cConfig *object)
   if (!strcmp(parsed_strs[0],"PTH"))
   {
     for (i = 1; i < strs_ind; i++)
-      if (stat(parsed_strs[i],&temp_stat) != -1)
-        FillWithPath(parsed_strs[i],((atoi(object->GetValue(CONFIG_FORMAT)))? _mp3 : _ogg),((object->GetValue(CONFIG_RECURSIVE) != NULL) && atoi(object->GetValue(CONFIG_RECURSIVE))));
+      if (stat(parsed_strs[i],&temp_stat) != -1) {
+        FillWithPath(
+          parsed_strs[i],
+          object->GetIntValue(CONFIG_FORMAT, 0) ? _mp3 : _ogg,
+          object->GetIntValue(CONFIG_RECURSIVE, 0)
+        );
+      }
   }
   else if (!strcmp(parsed_strs[0],"SQL"))
   {

@@ -59,7 +59,7 @@ void *selector(void *arg)
 
   while (!ok_to_end)
   {
-    i = (((conf_obj->GetValue(CONFIG_SHUFFLE) != NULL) && (!atoi(conf_obj->GetValue(CONFIG_SHUFFLE))))? 1 : (rand() % 256));
+    i = (conf_obj->GetIntValue(CONFIG_SHUFFLE, 0)) ? 1 : (rand() % 256);
 
     sem_obj->Wait(data_mutex);
 
@@ -88,7 +88,7 @@ void *selector(void *arg)
     }
     else if (ready_obj->Empty())
     {
-      if ((conf_obj->GetValue(CONFIG_LOOP) == NULL) || atoi(conf_obj->GetValue(CONFIG_LOOP)))
+      if (conf_obj->GetIntValue(CONFIG_LOOP, 0))
       {
         cCircularList *temp;
 

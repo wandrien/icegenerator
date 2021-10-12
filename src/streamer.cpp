@@ -118,7 +118,7 @@ void cStreamer::SetData(cConfig *object)
           shout_set_host(ShoutData,object->GetValue(CONFIG_IP));
           break;
         case CONFIG_PORT:
-          shout_set_port(ShoutData,atoi(object->GetValue(CONFIG_PORT)));
+          shout_set_port(ShoutData,object->GetIntValue(CONFIG_PORT, 0));
           break;
         case CONFIG_MOUNT:
           shout_set_mount(ShoutData,object->GetValue(CONFIG_MOUNT));
@@ -127,7 +127,7 @@ void cStreamer::SetData(cConfig *object)
           shout_set_password(ShoutData,object->GetValue(CONFIG_PASSWORD));
           break;
         case CONFIG_SERVER:
-          switch (atoi(object->GetValue(CONFIG_SERVER)))
+          switch (object->GetIntValue(CONFIG_SERVER, 0))
           {
             case 2:
               shout_set_protocol(ShoutData,SHOUT_PROTOCOL_HTTP);
@@ -157,13 +157,13 @@ void cStreamer::SetData(cConfig *object)
           shout_set_audio_info(ShoutData,SHOUT_AI_BITRATE,object->GetValue(CONFIG_BITRATE));
           break;
         case CONFIG_PUBLIC:
-          shout_set_public(ShoutData,atoi(object->GetValue(CONFIG_PUBLIC)));
+          shout_set_public(ShoutData,object->GetIntValue(CONFIG_PUBLIC, 0));
           break;
         case CONFIG_DUMPFILE:
           shout_set_dumpfile(ShoutData,object->GetValue(CONFIG_DUMPFILE));
           break;
         case CONFIG_FORMAT:
-          switch (atoi(object->GetValue(CONFIG_FORMAT)))
+          switch (object->GetIntValue(CONFIG_FORMAT, 0))
           {
             case 0:
               shout_set_format(ShoutData,SHOUT_FORMAT_VORBIS);

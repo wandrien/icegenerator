@@ -75,7 +75,7 @@ cLog::cLog(cConfig *object)
 {
   int_buf = new char[INTERNAL_BUF_SIZE];
 
-  switch (LogSelected = ((log_type) atoi(object->GetValue(CONFIG_LOG))))
+  switch (LogSelected = ((log_type) object->GetIntValue(CONFIG_LOG, 0)))
   {
     case _none: break;
     case _system: openlog("Icecast Generator",LOG_PID,LOG_USER);

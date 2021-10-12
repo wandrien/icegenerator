@@ -55,6 +55,7 @@
 	
 #endif
 
+#include <stdlib.h>
 #include "config.h"
 
 static const char * keys[MAX_KEYS] = {
@@ -145,6 +146,14 @@ void cConfig::SetValue(config_key_type key, const char *value)
 char * cConfig::GetValue(config_key_type key) const
 {
   return Table[key];
+}
+
+int cConfig::GetIntValue(config_key_type key, int default_value) const
+{
+  char * value = GetValue(key);
+  if (value)
+    return atoi(value);
+  return default_value;
 }
 
 int cConfig::ParseLine(const char *buf, char *key, char *value)
