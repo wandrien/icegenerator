@@ -1,4 +1,4 @@
-noinst_PROGRAMS = catch
+check_PROGRAMS = catch
 TESTS = catch
 
 NULL =
