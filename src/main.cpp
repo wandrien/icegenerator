@@ -139,7 +139,21 @@
   #ifdef HAVE_UNISTD_H
     #include <unistd.h>
   #endif
-  
+
+  #ifdef HAVE_ERR_H
+    #include <err.h>
+  #endif
+
+  #ifdef HAVE_ERR_H
+    #include <errno.h>
+  #endif
+
+  #if defined(HAVE_BSD_LIBUTIL_H)
+     #include <bsd/libutil.h>
+  #elif defined(HAVE_LIBUTIL_H)
+     #include <libutil.h>
+  #endif
+
   #define APPNAME PACKAGE_STRING
 #else
   #define APPNAME "IceGenerator"
@@ -254,6 +268,7 @@ main
   int i, c;
   bool is_daemon = true;
   pthread_t player_tid, selector_tid, data_streamer_tid, data_server_tid;
+  struct pidfh * pidfile = NULL;
 
   try
   {
@@ -297,6 +312,19 @@ main
       CHECK_ACTION(quitnow)
       CHECK_ACTION(quit_now)
       #undef CHECK_ACTION
+    }
+
+    /* Open pidfile */
+    const char * pidfile_path = conf_obj->GetValue(CONFIG_PIDFILE);
+    pid_t other_pid;
+    if (pidfile_path) {
+      pidfile = pidfile_open(pidfile_path, 0600, &other_pid);
+      if (pidfile == NULL) {
+        if (errno == EEXIST) {
+              errx(1, "Daemon already running, pid: %jd.", (intmax_t)other_pid);
+        }
+        err(1, "Cannot open or create pidfile: %s", pidfile_path);
+      }
     }
 
     /* Init log file */
@@ -346,6 +374,10 @@ main
       log_obj->WriteLog("Going to daemon land...");
     }
 
+    if (pidfile) {
+      pidfile_write(pidfile);
+    }
+
     /* Install signal handler */
     sig_obj = new cSignal();
     sig_obj->AddHandler(SIGHUP,signal_termination_proc);
@@ -389,6 +421,10 @@ main
       printf("%s\n\n",ErrStr);
 
     clean_objs();
+  }
+
+  if (pidfile) {
+    pidfile_remove(pidfile);
   }
 
   return 0;

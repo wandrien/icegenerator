@@ -88,6 +88,15 @@ LOOP=1
 # alphabetic order will be used
 SHUFFLE=1
 
+
+
+#######################################################
+# Environment integration section
+#######################################################
+
+# Path to save the process PID
+PIDFILE=
+
 # Action on receiving a signal
 # ignore   - Ignore signal
 # quit     - Quit after current track

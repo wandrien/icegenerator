@@ -189,6 +189,8 @@ void cStreamer::SetData(cConfig *object)
         case CONFIG_METAUPDATE:
         case CONFIG_DATAPORT:
         case CONFIG_LOGPATH:
+        case CONFIG_SIGNAL_ACTION:
+        case CONFIG_PIDFILE:
         case CONFIG_MDFPATH: break;
       }
     }

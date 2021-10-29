@@ -114,8 +114,14 @@ dnl Utility functions
 echo -e $'\n'$'\n'Other functions
 AC_HEADER_TIME
 AC_STRUCT_TM
-AC_CHECK_HEADERS(time.h)
-AC_CHECK_FUNCS(sleep time srand rand getpid,[have_other_funcs=yes],AC_MSG_ERROR([required function missing]))
+AC_CHECK_HEADERS(time.h err.h errno.h)
+AC_CHECK_FUNCS(sleep time srand rand getpid err errx,[have_other_funcs=yes],AC_MSG_ERROR([required function missing]))
+
+dnl LIBBSD functions
+echo -e $'\n'$'\n'LIBBSD functions
+AC_CHECK_HEADERS(bsd/libutil.h)
+AC_CHECK_HEADERS(libutil.h)
+LDFLAGS="$LDFLAGS -lbsd"
 
 dnl check for shout library path
 echo -e $'\n'$'\n'SHOUT library
