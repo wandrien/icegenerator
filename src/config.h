@@ -46,13 +46,13 @@ enum config_key_type {
 
 static_assert(CONFIG_BADKEY == MAX_KEYS, "Wrong MAX_KEYS");
 
-#define INTERNAL_BUF_SIZE 512
-                       
+#define CONFIG_MAX_LINE_SIZE 512
+
 class cConfig
 {
   char *Table[MAX_KEYS];
   char *int_buf;
-  int ParseLine(const char *buf, char *key, char *value);
+  int ParseLine(const char *buf, char *key, ssize_t key_size, char *value, ssize_t value_size);
   config_key_type LookupKey(const char *key) const;
 public:
   cConfig(const char *path);

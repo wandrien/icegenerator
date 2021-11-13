@@ -75,22 +75,27 @@ cConfig::cConfig(const char *path)
 
   for (i = ((int) CONFIG_IP); i < ((int) CONFIG_BADKEY); Table[i++] = NULL);
 
-  int_buf = new char[INTERNAL_BUF_SIZE];
-  
+  int_buf = new char[CONFIG_MAX_LINE_SIZE];
+
   if (fp != NULL)
   {
     char *key, *value;
-    config_key_type _key;
+    config_key_type config_key;
 
-    key = new char[64];
-    value = new char[127];
-  
-    while (fgets(int_buf,511,fp) != NULL)
-      if (!ParseLine(int_buf,key,value) && ((_key = LookupKey(key)) != CONFIG_BADKEY))
-        SetValue(_key,value);
+    key = new char[CONFIG_MAX_LINE_SIZE];
+    value = new char[CONFIG_MAX_LINE_SIZE];
+
+    while (fgets(int_buf, CONFIG_MAX_LINE_SIZE - 1,  fp) != NULL) {
+      if (ParseLine(int_buf, key, CONFIG_MAX_LINE_SIZE, value, CONFIG_MAX_LINE_SIZE) != 0)
+        continue;
+      config_key = LookupKey(key);
+      if (config_key == CONFIG_BADKEY)
+        continue;
+      SetValue(config_key, value);
+    }
 
     fclose(fp);
-      
+
     delete [] key;
     delete [] value;
   }
@@ -156,52 +161,72 @@ int cConfig::GetIntValue(config_key_type key, int default_value) const
   return default_value;
 }
 
-int cConfig::ParseLine(const char *buf, char *key, char *value)
+int cConfig::ParseLine(const char *buf, char *key, ssize_t key_size, char *value, ssize_t value_size)
 {
-  int i, idx = 0, err = 0, state = 0;
+  int i, err = 0, state = 0;
+  int key_idx = 0;
+  int value_idx = 0;
+
+  if (!key || !value || key_size < 1|| value_size < 1)
+    return -1;
 
   key[0] = '\0';
+  value[0] = '\0';
 
   for (i = 0; (buf[i] && !err); i++)
   {
+    if (key_idx >= key_size - 1 || value_idx >= value_size - 1) {
+       err = -1;
+       break;
+    }
+
+    char c = buf[i];
+
     switch (state)
     {
-      case 0: if (buf[i] == '#')		// initial state
-                err = 1;			// signal comment
-              else if (isalpha(buf[i]))
-              {
-              	key[idx++] = toupper(buf[i]);	// acquire first char of first sequence
-                state = 1;			// acquire first sequence state
+      case 0: // initial state
+              if (c == '#') { // signal comment
+                err = 1;
               }
-              else if (buf[i] != ' ')		// skip initial spaces
+              else if (isalpha(c)) { // first char of the KEY
+                key[key_idx++] = toupper(c);
+                state = 1;
+              }
+              else if (c != ' ') { // skip initial spaces
+                err = -1;
+              }
+              break;
+      case 1: // read the KEY
+              if (c == ' ') { // end of the KEY
+                state = 2;
+              }
+              else if (c == '=') { // end of the KEY and "=", so skip state 2
+                state = 3;
+              }
+              else if (isalnum(c) || (c == '_')) {
+                key[key_idx++] = toupper(c);
+              }
+              else {
+                err = -1;
+              }
+              break;
+      case 2: // read "="
+              // do not accept anything else but spaces and single "="
+              if (c == '=')
+                state = 3;
+              else if (c != ' ')
                 err = -1;
               break;
-      case 1: if (buf[i] == ' ')		// do not accept more chars
-                state = 2;			// on space
-              else if (buf[i] == '=')
+      case 3: // read spaces after "="
+              if ((c != ' ') && !iscntrl(c))
               {
-                key[idx] = '\0';		// on equal, close first sequence,
-                idx = 0;
-                state = 3;			// acquire equal state
-              }
-              else if (isalnum(buf[i]) || (buf[i] == '_'))
-                key[idx++] = toupper(buf[i]);	// acquire next char of first sequence
-              else
-                err = -1;
-              break;
-      case 2: if (buf[i] == '=')
-                state = 3;			// acquire equal state
-              else if (buf[i] != ' ')
-                err = -1;			// do not accept anything else but spaces
-              break;
-      case 3: if ((buf[i] != ' ') && !iscntrl(buf[i]))
-              {
-              	value[idx++] = buf[i];
-                state = 4;			// acquire second sequence state
+                value[value_idx++] = c;
+                state = 4;
               }
               break;
-      case 4: if (isalnum(buf[i]) || ispunct(buf[i]) || (buf[i] == ' '))
-                value[idx++] = buf[i];		// acquire next char of second sequence
+      case 4: // read the VALUE
+              if (c != '\n' && c != '\r')
+                value[value_idx++] = c;
               break;
     }
   }
@@ -209,7 +234,8 @@ int cConfig::ParseLine(const char *buf, char *key, char *value)
   if (state == 0)
     err = 1;
 
-  value[idx] = '\0';				// close second sequence
+  key[key_idx] = '\0';
+  value[value_idx] = '\0';
 
-  return err;					// signal error code
+  return err;
 }
