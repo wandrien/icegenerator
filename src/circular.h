@@ -51,6 +51,8 @@
   #endif
 #endif
 
+#include <string>
+
 #include "config.h"
 
 #define MAX_ID3_TAGS 16
@@ -94,7 +96,7 @@ class cCircularList
   bool HereStarts() const;
   bool HereFits(const char *buf) const;
   bool GreaterThan(const char *s1, const char *s2) const;
-  bool FillWithPath(const char *buf, file_type ft, int recursive);
+  bool FillWithPath(const std::string& path, file_type ft, int recursive);
   #ifdef HAVE_MYSQL
   bool FillWithMySQL(const char *host, unsigned int port, const char *user, const char *passwd,
                      const char *db, const char *table, const char *field);

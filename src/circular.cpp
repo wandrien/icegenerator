@@ -392,14 +392,17 @@ bool cCircularList::IsMedia(const char *buf, file_type ft) const
   return result;
 }
 
-bool cCircularList::FillWithPath(const char *buf, file_type ft, int recursive)
+bool cCircularList::FillWithPath(const std::string& path, file_type ft, int recursive)
 {
   bool result = false;
-  char temp[255];
+  std::string item_path;
   struct dirent *ptr;
   DIR *fd;
 
-  fd = opendir(buf);
+  if (path.length() < 1)
+    return result;
+
+  fd = opendir(path.c_str());
   if (fd != NULL)
   {
     while ((ptr = readdir(fd)) != NULL)
@@ -407,22 +410,24 @@ bool cCircularList::FillWithPath(const char *buf, file_type ft, int recursive)
       {
         struct stat s;
 
-        strcpy(temp,buf);
-        if (temp[strlen(temp)-1] != '/')
-          strcat(temp,"/");
-        strcat(temp,ptr->d_name);
-        if (!stat(temp,&s))
+        item_path = path;
+        if (path.back() != '/')
+          item_path += '/';
+
+        item_path += ptr->d_name;
+
+        if (!stat(item_path.c_str(),&s))
         {
           if (recursive && S_ISDIR(s.st_mode))
-            result |= FillWithPath(temp,ft,recursive);
+            result |= FillWithPath(item_path.c_str(),ft,recursive);
 
-          if (IsMedia(temp,ft))
+          if (IsMedia(item_path.c_str(),ft))
           {
             result = true;
             if (Ptr != NULL)
-              while (!HereFits(temp))
+              while (!HereFits(item_path.c_str()))
                 StepFwd();
-            Insert(temp);
+            Insert(item_path.c_str());
           }
         }
       }
