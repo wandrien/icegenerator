@@ -62,6 +62,7 @@
 #endif
 
 #include <stdarg.h>
+#include <unistd.h>
 
 #include "log.h"
 #include "utils.h"
@@ -73,48 +74,64 @@ cLog::cLog()
 
 cLog::cLog(cConfig *object)
 {
+  LogFp = NULL;
   int_buf = new char[INTERNAL_BUF_SIZE];
 
   switch (LogSelected = ((log_type) object->GetIntValue(CONFIG_LOG, 0)))
   {
-    case _none: break;
-    case _system: openlog("Icecast Generator",LOG_PID,LOG_USER);
-                  break;
-    case _file: if (object->GetValue(CONFIG_LOGPATH) != NULL)
-                  strcpy(int_buf,object->GetValue(CONFIG_LOGPATH));
-                else
-                  strcpy(int_buf,"/var/log/icegenerator.log");
-                if ((LogFp = fopen(int_buf,"a")) == NULL)
-                {
-                  printf("Warning: cannot create /var/log/icegenerator.log\nNo log will happen\n");
-                  LogSelected = _none;
-                }
-                break;
+    case _none:
+      break;
+    case _system:
+      openlog("Icecast Generator",LOG_PID,LOG_USER);
+      break;
+    case _file:
+      if (object->GetValue(CONFIG_LOGPATH) != NULL)
+        strcpy(int_buf,object->GetValue(CONFIG_LOGPATH));
+      else
+        strcpy(int_buf,"/var/log/icegenerator.log");
+      if ((LogFp = fopen(int_buf,"a")) == NULL)
+      {
+        int fd = dup(2);
+        if (fd >= 0)
+        {
+          LogFp = fdopen(fd, "a");
+          printf("Warning: cannot create %s. Log will be sent to /dev/stderr.\n", int_buf);
+        }
+        else
+        {
+          LogSelected = _none;
+        }
+      }
+      break;
   }
 }
 
 
 void cLog::WriteLog(const char *msg, const char *data)
 {
-  time_t now;
-  
   switch (LogSelected)
   {
-    case _none: break;
-    case _system: if (data == NULL)
-                    syslog(LOG_INFO,"%s\n",msg);
-                  else
-                    syslog(LOG_INFO,"%s %s\n",msg,data); 
-                  break;
-    case _file: now = time(NULL);
-                strcpy(int_buf,asctime(localtime(&now)));
-                int_buf[strlen(int_buf)-1] = '\0';
-                if (data == NULL)
-                  fprintf(LogFp,"%s: %s\n",int_buf,msg);
-                else
-                  fprintf(LogFp,"%s: %s %s\n",int_buf,msg,data);
-                fflush(LogFp);
-                break;
+    case _none:
+      break;
+    case _system:
+      if (data == NULL)
+        syslog(LOG_INFO,"%s\n",msg);
+      else
+        syslog(LOG_INFO,"%s %s\n",msg,data);
+      break;
+    case _file:
+      if (LogFp)
+      {
+        time_t now = time(NULL);
+        strcpy(int_buf,asctime(localtime(&now)));
+        int_buf[strlen(int_buf)-1] = '\0';
+        if (data == NULL)
+          fprintf(LogFp,"%s: %s\n",int_buf,msg);
+        else
+          fprintf(LogFp,"%s: %s %s\n",int_buf,msg,data);
+        fflush(LogFp);
+      }
+      break;
   }
 }
 
@@ -135,12 +152,18 @@ cLog::~cLog()
 {
   switch (LogSelected)
   {
-    case _none: break;
-    case _system: closelog();
-                  break;
-    case _file: fprintf(LogFp,"\n\n");
-                fclose(LogFp);
-                break;
+    case _none:
+      break;
+    case _system:
+      closelog();
+      break;
+    case _file:
+      if (LogFp)
+      {
+        fprintf(LogFp,"\n\n");
+        fclose(LogFp);
+      }
+      break;
   }
 
   delete [] int_buf;
