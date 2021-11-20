@@ -3,6 +3,7 @@ modules="
   config.cpp
   data_server.cpp
   data_streamer.cpp
+  external_handlers.cpp
   log.cpp
   main.cpp
   meta_parser.cpp

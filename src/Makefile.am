@@ -8,6 +8,7 @@ icegenerator_SOURCES = \
   config.cpp \
   data_server.cpp \
   data_streamer.cpp \
+  external_handlers.cpp \
   log.cpp \
   main.cpp \
   meta_parser.cpp \
@@ -25,6 +26,7 @@ noinst_HEADERS = \
   config_keys.h \
   data_server.h \
   data_streamer.h \
+  external_handlers.h \
   globals.h \
   log.h \
   main.h \

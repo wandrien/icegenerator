@@ -103,6 +103,13 @@ PIDFILE=
 # quitnow  - Quit immediately
 SIGNAL_ACTION=quit
 
+# Commands to run on track start/stop.
+# Variable expansion:
+#       %p - full path to the file
+#       %% - %
+# ON_TRACK_START=/path/to/your/script %p
+# ON_TRACK_STOP=
+
 
 
 #######################################################

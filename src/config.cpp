@@ -150,6 +150,8 @@ void cConfig::SetValue(config_key_type key, const char *value)
 
 char * cConfig::GetValue(config_key_type key) const
 {
+  if (key >= MAX_KEYS)
+    return NULL;
   return Table[key];
 }
 

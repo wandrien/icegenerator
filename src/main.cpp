@@ -159,6 +159,7 @@
   #define APPNAME "IceGenerator"
 #endif
 
+#include "external_handlers.h"
 #include "log.h"
 #include "config.h"
 #include "sgnl_handler.h"
@@ -405,6 +406,8 @@ main
       close_data_server();
       pthread_join(data_server_tid,NULL);
     }
+
+    wait_for_handlers();
 
     log_obj->WriteLog("Have a nice day");
 

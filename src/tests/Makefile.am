@@ -8,6 +8,7 @@ catch_SOURCES = \
   _catch_stub_config.cpp \
   _catch_stub_data_server.cpp \
   _catch_stub_data_streamer.cpp \
+  _catch_stub_external_handlers.cpp \
   _catch_stub_log.cpp \
   _catch_stub_main.cpp \
   _catch_stub_meta_parser.cpp \

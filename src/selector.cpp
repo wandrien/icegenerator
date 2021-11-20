@@ -44,13 +44,14 @@
 
 #include "globals.h"
 #include "selector.h"
+#include "external_handlers.h"
 
 void *selector(void *arg)
 {
   int i;
   bool first_time = true;
   char *int_buf;
-  
+
   sig_obj->Block();
 
   srand((int) time(NULL));
@@ -71,13 +72,17 @@ void *selector(void *arg)
       first_time = false;
     }
     sem_obj->Signal(data_mutex);
-  
+
     ready_obj->GetFile(int_buf);
     log_obj->WriteLog("Now playing",int_buf);
+
+    run_handler_on_track_start();
 
     sem_obj->Signal(track_load);
 
     sem_obj->Wait(end_track);
+
+    run_handler_on_track_stop();
 
     played_obj->Insert(ready_obj->Remove());
 
