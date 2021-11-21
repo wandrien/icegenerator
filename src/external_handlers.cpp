@@ -32,7 +32,8 @@ static void run_handler_on_track_start_stop(config_key_type config_key)
     return;
 
   std::map<char, std::string> variables{
-    { 'p', ready_obj->GetData()}
+    { 'p', ready_obj->GetData()},
+    { 'e', conf_obj->GetKeyName(config_key)}
   };
 
   std::string prepared_command = substitute_prefixed_variables(

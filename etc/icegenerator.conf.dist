@@ -106,6 +106,7 @@ SIGNAL_ACTION=quit
 # Commands to run on track start/stop.
 # Variable expansion:
 #       %p - full path to the file
+#       %e - event: ON_TRACK_START, ON_TRACK_STOP
 #       %% - %
 # ON_TRACK_START=/path/to/your/script %p
 # ON_TRACK_STOP=

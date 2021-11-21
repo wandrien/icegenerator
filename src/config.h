@@ -60,6 +60,8 @@ public:
   char *GetValue(config_key_type key) const;
   int GetIntValue(config_key_type key, int default_value) const;
   void SetValue(config_key_type key, const char *value);
+  const char *GetKeyName(config_key_type key) const;
+  bool IsValidKey(config_key_type key) const;
 };
 
 extern char ErrStr[];

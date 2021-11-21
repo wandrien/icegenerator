@@ -150,7 +150,7 @@ void cConfig::SetValue(config_key_type key, const char *value)
 
 char * cConfig::GetValue(config_key_type key) const
 {
-  if (key >= MAX_KEYS)
+  if (!IsValidKey(key))
     return NULL;
   return Table[key];
 }
@@ -240,4 +240,16 @@ int cConfig::ParseLine(const char *buf, char *key, ssize_t key_size, char *value
   value[value_idx] = '\0';
 
   return err;
+}
+
+const char *cConfig::GetKeyName(config_key_type key) const
+{
+  if (!IsValidKey(key))
+    return NULL;
+  return keys[key];
+}
+
+bool cConfig::IsValidKey(config_key_type key) const
+{
+    return key >= CONFIG_IP && key < CONFIG_BADKEY;
 }
