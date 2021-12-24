@@ -60,7 +60,7 @@ void *selector(void *arg)
 
   while (!ok_to_end)
   {
-    i = (conf_obj->GetIntValue(CONFIG_SHUFFLE, 0)) ? (rand() % 256) : 1;
+    i = (conf_obj->GetIntValue(CONFIG_SHUFFLE, 0)) ? (rand() % 1024 + rand() % 256) : 1;
 
     sem_obj->Wait(data_mutex);
 
